@@ -16,7 +16,8 @@ class Pixabay {
     this.SearchFormMarkup = searchFormTemplate();
     this.refs.searchFormContainer.insertAdjacentHTML('afterbegin', this.SearchFormMarkup);
     this.refs.searchFormRef = document.getElementById('search-form');
-    this.refs.searchFormRef.addEventListener('input', debounce(this.onSearch.bind(this), 500));
+    // this.refs.submitBtn = document.querySelector('.submit-btn');
+    this.refs.searchFormRef.addEventListener('submit', this.onSearch.bind(this));
   }
 
   renderGallery() {
@@ -24,8 +25,11 @@ class Pixabay {
   }
 
   onSearch(e) {
-    if (e.target.value) {
-      this.REQ = e.target.value;
+    e.preventDefault();
+    console.log(e.currentTarget.elements.query.value);
+    if (e.currentTarget.elements.query.value) {
+      e.preventDefault();
+      this.REQ = e.currentTarget.elements.query.value;
       this.PAGE = 1;
       console.log(this.REQ);
       fetch(
