@@ -1,7 +1,9 @@
 // let Handlebars = require('handlebars');
 import searchFormTemplate from '../templates/search-form.hbs';
 import gallerytemplate from '../templates/image-card.hbs';
-import debounce from 'lodash.debounce';
+import * as basicLightbox from 'basiclightbox';
+// import '../sass/';
+
 class Pixabay {
   constructor(perPage, key) {
     this.PER_PAGE = perPage;
@@ -20,18 +22,12 @@ class Pixabay {
     this.refs.searchFormRef.addEventListener('submit', this.onSearch.bind(this));
   }
 
-  renderGallery() {
-    this.galleryMarkup = gallery();
-  }
-
   onSearch(e) {
     e.preventDefault();
-    console.log(e.currentTarget.elements.query.value);
     if (e.currentTarget.elements.query.value) {
       e.preventDefault();
       this.REQ = e.currentTarget.elements.query.value;
       this.PAGE = 1;
-      console.log(this.REQ);
       fetch(
         `https://pixabay.com/api/?image_type=photo&orientation=horizontal&q=${this.REQ}&page=${this.PAGE}&per_page=${this.PER_PAGE}&key=${this.KEY}`,
       )
@@ -42,6 +38,7 @@ class Pixabay {
           this.refs.galleryContainer.innerHTML = '';
           this.refs.galleryContainer.insertAdjacentHTML('afterbegin', this.galleryMarkup);
           this.renderLoadMoreBtn();
+          this.refs.galleryContainer.addEventListener('click', this.onGalleryClick.bind(this));
         });
     } else {
       this.refs.galleryContainer.innerHTML = '';
@@ -76,6 +73,17 @@ class Pixabay {
           block: 'start',
         });
       });
+  }
+
+  onGalleryClick(e) {
+    if (e.target.nodeName !== 'IMG') {
+      return;
+    }
+
+    const instance = basicLightbox.create(`
+        <img src="${e.target.dataset.src}" width="800" height="600">
+    `);
+    instance.show();
   }
 }
 
